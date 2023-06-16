@@ -73,14 +73,14 @@ export const CustomersTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {items.map((customer) => {
-                const isSelected = selected.includes(customer.id);
-                const createdAt = format(customer.createdAt, 'dd/MM/yyyy');
+              {items?.data?.map((data) => {
+                const isSelected = selected.includes(data.id);
+                const createdAt = format(data.createdAt, 'dd/MM/yyyy');
 
                 return (
                   <TableRow
                     hover
-                    key={customer.id}
+                    key={data.id}
                     selected={isSelected}
                   >
                     <TableCell padding="checkbox">
@@ -88,9 +88,9 @@ export const CustomersTable = (props) => {
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            onSelectOne?.(customer.id);
+                            onSelectOne?.(data.id);
                           } else {
-                            onDeselectOne?.(customer.id);
+                            onDeselectOne?.(data.id);
                           }
                         }}
                       />
@@ -101,22 +101,22 @@ export const CustomersTable = (props) => {
                         direction="row"
                         spacing={2}
                       >
-                        <Avatar src={customer.avatar}>
-                          {getInitials(customer.name)}
+                        <Avatar src={data.avatar}>
+                          {getInitials(data.name)}
                         </Avatar>
                         <Typography variant="subtitle2">
-                          {customer.name}
+                          {data.name}
                         </Typography>
                       </Stack>
                     </TableCell>
                     <TableCell>
-                      {customer.email}
+                      {data.email}
                     </TableCell>
                     <TableCell>
-                      {customer.address.city}, {customer.address.state}, {customer.address.country}
+                      {data.addressCity}, {data.addressState}, {data.addressCountry}
                     </TableCell>
                     <TableCell>
-                      {customer.phone}
+                      {data.phone}
                     </TableCell>
                     <TableCell>
                       {createdAt}
