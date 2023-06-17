@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
-import { format } from 'date-fns';
+import PropTypes from "prop-types";
+import { format } from "date-fns";
 import {
   Avatar,
   Box,
@@ -12,10 +12,11 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography
-} from '@mui/material';
-import { Scrollbar } from 'src/components/scrollbar';
-import { getInitials } from 'src/utils/get-initials';
+  Typography,
+} from "@mui/material";
+import { Scrollbar } from "src/components/scrollbar";
+import { getInitials } from "src/utils/get-initials";
+import { useEffect } from "react";
 
 export const CustomersTable = (props) => {
   const {
@@ -29,115 +30,104 @@ export const CustomersTable = (props) => {
     onSelectOne,
     page = 0,
     rowsPerPage = 0,
-    selected = []
+    selected = [],
+    allTypesValue,
   } = props;
 
-  const selectedSome = (selected.length > 0) && (selected.length < items.length);
-  const selectedAll = (items.length > 0) && (selected.length === items.length);
+  const selectedSome = selected.length > 0 && selected.length < items.length;
+  const selectedAll = items.length > 0 && selected.length === items.length;
+  useEffect(() => {
+    setTimeout(() => {
+      console.log("items", items);
+    }, 5000);
+  }, []);
 
   return (
-    <Card>
-      <Scrollbar>
-        <Box sx={{ minWidth: 800 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedAll}
-                    indeterminate={selectedSome}
-                    onChange={(event) => {
-                      if (event.target.checked) {
-                        onSelectAll?.();
-                      } else {
-                        onDeselectAll?.();
-                      }
-                    }}
-                  />
-                </TableCell>
-                <TableCell>
-                  Name
-                </TableCell>
-                <TableCell>
-                  Email
-                </TableCell>
-                <TableCell>
-                  Location
-                </TableCell>
-                <TableCell>
-                  Phone
-                </TableCell>
-                <TableCell>
-                  Signed Up
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items?.data?.map((data) => {
-                const isSelected = selected.includes(data.id);
-                const createdAt = format(data.createdAt, 'dd/MM/yyyy');
+    <>
+      <Card>
+        <Scrollbar>
+          <Box sx={{ minWidth: 800 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedAll}
+                      indeterminate={selectedSome}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          onSelectAll?.();
+                        } else {
+                          onDeselectAll?.();
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Location</TableCell>
+                  <TableCell>Phone</TableCell>
+                  <TableCell>Signed Up</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {items?.data
+                  ?.filter((data) => {
+                    if (allTypesValue === undefined) {
+                      return data;
+                    } else {
+                      return data.name.includes(allTypesValue);
+                    }
+                  })
+                  .map((data) => {
+                    const isSelected = selected.includes(data.id);
+                    const createdAt = format(data.createdAt, "dd/MM/yyyy");
 
-                return (
-                  <TableRow
-                    hover
-                    key={data.id}
-                    selected={isSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={(event) => {
-                          if (event.target.checked) {
-                            onSelectOne?.(data.id);
-                          } else {
-                            onDeselectOne?.(data.id);
-                          }
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Stack
-                        alignItems="center"
-                        direction="row"
-                        spacing={2}
-                      >
-                        <Avatar src={data.avatar}>
-                          {getInitials(data.name)}
-                        </Avatar>
-                        <Typography variant="subtitle2">
-                          {data.name}
-                        </Typography>
-                      </Stack>
-                    </TableCell>
-                    <TableCell>
-                      {data.email}
-                    </TableCell>
-                    <TableCell>
-                      {data.addressCity}, {data.addressState}, {data.addressCountry}
-                    </TableCell>
-                    <TableCell>
-                      {data.phone}
-                    </TableCell>
-                    <TableCell>
-                      {createdAt}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Box>
-      </Scrollbar>
-      <TablePagination
-        component="div"
-        count={count}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
-    </Card>
+                    return (
+                      <TableRow hover key={data.id} selected={isSelected}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={isSelected}
+                            onChange={(event) => {
+                              if (event.target.checked) {
+                                onSelectOne?.(data.id);
+                              } else {
+                                onDeselectOne?.(data.id);
+                              }
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Stack alignItems="center" direction="row" spacing={2}>
+                            <Avatar src={data.avatar}>{getInitials(data.name)}</Avatar>
+                            <Typography variant="subtitle2">{data.name}</Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell>{data.email}</TableCell>
+                        <TableCell>
+                          {data.addressCity}, {data.addressState}, {data.addressCountry}
+                        </TableCell>
+                        <TableCell>{data.phone}</TableCell>
+                        <TableCell>{createdAt}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </Box>
+        </Scrollbar>
+        <TablePagination
+          component="div"
+          count={count}
+          onPageChange={onPageChange}
+          onRowsPerPageChange={onRowsPerPageChange}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[5, 10, 25]}
+        />
+      </Card>
+      <div>{allTypesValue}</div>
+    </>
   );
 };
 
@@ -152,5 +142,5 @@ CustomersTable.propTypes = {
   onSelectOne: PropTypes.func,
   page: PropTypes.number,
   rowsPerPage: PropTypes.number,
-  selected: PropTypes.array
+  selected: PropTypes.array,
 };

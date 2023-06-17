@@ -14,7 +14,6 @@ import axios from "axios";
 
 const now = new Date();
 
-
 const Page = () => {
   // const [page, setPage] = useState(0);
   // const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -22,9 +21,13 @@ const Page = () => {
   // const customersIds = useCustomerIds(customers);
   // const customersSelection = useSelection(customersIds);
   const [data, setData] = useState([]);
+  const [allTypesValue, setAllTypesValue] = useState();
 
   useEffect(() => {
     mainData();
+    setTimeout(() => {
+      console.log("data", data);
+    }, 3000);
   }, []);
 
   const mainData = () => {
@@ -32,13 +35,31 @@ const Page = () => {
       .get("https://645f54b29d35038e2d210e74.mockapi.io/crud")
       .then((result) => {
         setData(result);
-        console.log("result", result);
       })
       .catch((err) => {
         console.error(err);
       });
   };
 
+  // const mainData = async () => {
+  //   const url = new URL("https://645f54b29d35038e2d210e74.mockapi.io/crud?completed=true&page=1&limit=15");
+   
+
+  //   fetch(url, {
+  //     method: "GET",
+  //     headers: { "content-type": "application/json" },
+  //   })
+  //     .then((result,abc) => {
+  //       console.log(result,abc)
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
+
+  function handlePagination(event, pageNumber) {
+    setUpdateUrl(pageNumber);
+  }
   // const useCustomers = (page, rowsPerPage) => {
   //   return useMemo(() => {
   //     return applyPagination(data, page, rowsPerPage);
@@ -112,10 +133,11 @@ const Page = () => {
                 </Button>
               </div>
             </Stack>
-            <CustomersSearch />
+            <CustomersSearch setAllTypesValue={setAllTypesValue} />
             <CustomersTable
               // count={data.length}
               items={data}
+              allTypesValue={allTypesValue}
               // onDeselectAll={customersSelection.handleDeselectAll}
               // onDeselectOne={customersSelection.handleDeselectOne}
               // onPageChange={handlePageChange}
