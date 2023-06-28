@@ -4,6 +4,7 @@ import { Card, InputAdornment, OutlinedInput, SvgIcon } from "@mui/material";
 export const CustomersSearch = ({ setAllTypesValue }) => {
 const changeValue =(e)=>{
 setAllTypesValue(e.target.value)
+console.log('e.target.value', e.target.value)
 }
   return (
   <>

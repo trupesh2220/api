@@ -10,7 +10,7 @@ export const CompaniesSearch = ({setAllTypesValue}) => {
       <Card sx={{ p: 2 }}>
         <OutlinedInput
         onChange={changeValue}
-          defaultValue=""
+          defaultValue="title"
           fullWidth
           placeholder="Search company"
           startAdornment={

@@ -3,8 +3,10 @@ import { format } from "date-fns";
 import {
   Avatar,
   Box,
+  Button,
   Card,
   Checkbox,
+  Pagination,
   Stack,
   Table,
   TableBody,
@@ -16,7 +18,9 @@ import {
 } from "@mui/material";
 import { Scrollbar } from "src/components/scrollbar";
 import { getInitials } from "src/utils/get-initials";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import axios from "axios";
 
 export const CustomersTable = (props) => {
   const {
@@ -32,15 +36,25 @@ export const CustomersTable = (props) => {
     rowsPerPage = 0,
     selected = [],
     allTypesValue,
+    setPageVale,
+    setDeleteData,
+    pageNo
   } = props;
 
-  const selectedSome = selected.length > 0 && selected.length < items.length;
+
   const selectedAll = items.length > 0 && selected.length === items.length;
-  useEffect(() => {
-    setTimeout(() => {
-      console.log("items", items);
-    }, 5000);
-  }, []);
+  const selectedSome = selected.length > 0 && selected.length < items.length;
+
+ 
+
+  const deleteDataFromList = (data) => {
+    axios.delete(`http://localhost:8000/data/${data}`);
+    setDeleteData(data)
+  };
+
+  const changePagination = (event, pageNumber) => {
+    setPageVale(pageNumber);
+  };
 
   return (
     <>
@@ -67,22 +81,23 @@ export const CustomersTable = (props) => {
                   <TableCell>Email</TableCell>
                   <TableCell>Location</TableCell>
                   <TableCell>Phone</TableCell>
-                  <TableCell>Signed Up</TableCell>
+                  <TableCell>createdAt</TableCell>
+                  <TableCell>edit value</TableCell>
+                  <TableCell>delete value</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {items?.data
-                  ?.filter((data) => {
-                    if (allTypesValue === undefined) {
-                      return data;
-                    } else {
-                      return data.name.includes(allTypesValue);
-                    }
-                  })
+                {items
+                  // ?.filter((data) => {
+                  //   if (allTypesValue === undefined) {
+                  //     return data;
+                  //   } else {
+                  //     return data.name.includes(allTypesValue);
+                  //   }
+                  // })
                   .map((data) => {
                     const isSelected = selected.includes(data.id);
-                    const createdAt = format(data.createdAt, "dd/MM/yyyy");
-
+                    // const createdAt = format(data.createdAt, "dd/MM/yyyy");
                     return (
                       <TableRow hover key={data.id} selected={isSelected}>
                         <TableCell padding="checkbox">
@@ -108,7 +123,15 @@ export const CustomersTable = (props) => {
                           {data.addressCity}, {data.addressState}, {data.addressCountry}
                         </TableCell>
                         <TableCell>{data.phone}</TableCell>
-                        <TableCell>{createdAt}</TableCell>
+                        <TableCell>{data.createdAt.toString()}</TableCell>
+                        <TableCell>
+                          <Link href={`/edit/${data.id}`}>Edit</Link>
+                        </TableCell>
+                        <TableCell>
+                          <Button type="button" onClick={() => deleteDataFromList(data.id)}>
+                            Delete
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -116,17 +139,11 @@ export const CustomersTable = (props) => {
             </Table>
           </Box>
         </Scrollbar>
-        <TablePagination
-          component="div"
-          count={count}
-          onPageChange={onPageChange}
-          onRowsPerPageChange={onRowsPerPageChange}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[5, 10, 25]}
-        />
+        {pageNo.pageSecond}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
+        { <Pagination count={allTypesValue === ""?Math.ceil(pageNo.pageOne/10):Math.ceil(pageNo.pageSecond/10)} onChange={changePagination} color="secondary" hidden={pageNo.pageOne === 0 || pageNo.pageSecond === 0}/>}
+        </div>
       </Card>
-      <div>{allTypesValue}</div>
     </>
   );
 };

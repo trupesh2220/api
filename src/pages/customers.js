@@ -4,81 +4,96 @@ import { subDays, subHours } from "date-fns";
 import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
 import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import { Box, Button, Container, Stack, SvgIcon, Typography } from "@mui/material";
+import { Box, Button, Container, Modal, Stack, SvgIcon, Typography } from "@mui/material";
 import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { CustomersTable } from "src/sections/customer/customers-table";
 import { CustomersSearch } from "src/sections/customer/customers-search";
 import { applyPagination } from "src/utils/apply-pagination";
 import axios from "axios";
+import BasicModal from "src/Model/ModelPopup";
+import { node } from "prop-types";
 
 const now = new Date();
 
 const Page = () => {
-  // const [page, setPage] = useState(0);
-  // const [rowsPerPage, setRowsPerPage] = useState(5);
-  // const customers = useCustomers(page, rowsPerPage);
-  // const customersIds = useCustomerIds(customers);
-  // const customersSelection = useSelection(customersIds);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [PageValue, setPageVale] = useState();
   const [data, setData] = useState([]);
-  const [allTypesValue, setAllTypesValue] = useState();
+  const [allTypesValue, setAllTypesValue] = useState("");
+  const [showAllDataWithValue, setShowAllDataWithValue] = useState(false);
+  const [rowsPerPageOptions, setRowsPerPageOptions] = useState();
+  const [deleteData, setDeleteData] = useState('')
+  const [pageNo, setPageNo] = useState({pageOne:Number,pageSecond:Number})
+  useEffect(() => {
+    mainData();
+    callApi()
+  }, []);
 
   useEffect(() => {
     mainData();
-    setTimeout(() => {
-      console.log("data", data);
-    }, 3000);
-  }, []);
+    callApi()
+  }, [PageValue, allTypesValue,deleteData]);
 
-  const mainData = () => {
+ const  mainData = () => {
+    if (allTypesValue === "") {
+      axios
+        .get(`http://localhost:8000/data?&_page=${PageValue}&_limit=${10}`)
+        .then((result) => {
+          setData(result.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
     axios
-      .get("https://645f54b29d35038e2d210e74.mockapi.io/crud")
+      .get(`http://localhost:8000/data?name=${allTypesValue}&_page=${PageValue}&_limit=${10}`)
       .then((result) => {
-        setData(result);
+        setData(result.data);
       })
       .catch((err) => {
         console.error(err);
       });
+    } 
   };
 
-  // const mainData = async () => {
-  //   const url = new URL("https://645f54b29d35038e2d210e74.mockapi.io/crud?completed=true&page=1&limit=15");
-   
+  const  callApi = () => {
+      if (allTypesValue === '') {
+        axios
+        .get(`http://localhost:8000/data`)
+        .then((result) => {
+          setPageNo({pageOne:result.data.length});
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+      }else {
+        axios
+          .get(`http://localhost:8000/data?name=${allTypesValue}`)
+          .then((result) => {
+            setPageNo({pageSecond:result.data.length});
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+        } 
+     
+  };
+  
 
-  //   fetch(url, {
-  //     method: "GET",
-  //     headers: { "content-type": "application/json" },
-  //   })
-  //     .then((result,abc) => {
-  //       console.log(result,abc)
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
 
   function handlePagination(event, pageNumber) {
     setUpdateUrl(pageNumber);
   }
-  // const useCustomers = (page, rowsPerPage) => {
-  //   return useMemo(() => {
-  //     return applyPagination(data, page, rowsPerPage);
-  //   }, [page, rowsPerPage]);
-  // };
 
-  // const useCustomerIds = (customers) => {
-  //   return useMemo(() => {
-  //     return customers.map((customer) => customer.id);
-  //   }, [customers]);
-  // };
+  const handlePageChange = useCallback((event, value) => {
+    setPage(value);
+  }, []);
 
-  // const handlePageChange = useCallback((event, value) => {
-  //   setPage(value);
-  // }, []);
-
-  // const handleRowsPerPageChange = useCallback((event) => {
-  //   setRowsPerPage(event.target.value);
-  // }, []);
+  const handleRowsPerPageChange = useCallback((event) => {
+    setRowsPerPage(event.target.value);
+  }, []);
 
   return (
     <>
@@ -120,33 +135,22 @@ const Page = () => {
                   </Button>
                 </Stack>
               </Stack>
-              <div>
-                <Button
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained"
-                >
-                  Add
-                </Button>
-              </div>
+
+              <BasicModal />
             </Stack>
             <CustomersSearch setAllTypesValue={setAllTypesValue} />
             <CustomersTable
-              // count={data.length}
+              //count={data.length}
               items={data}
               allTypesValue={allTypesValue}
               // onDeselectAll={customersSelection.handleDeselectAll}
               // onDeselectOne={customersSelection.handleDeselectOne}
-              // onPageChange={handlePageChange}
-              // onRowsPerPageChange={handleRowsPerPageChange}
-              // onSelectAll={customersSelection.handleSelectAll}
-              // onSelectOne={customersSelection.handleSelectOne}
-              // page={page}
-              // rowsPerPage={rowsPerPage}
-              // selected={customersSelection.selected}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              setRowsPerPageOptions={setRowsPerPageOptions}
+              setPageVale={setPageVale}
+              setDeleteData={setDeleteData}
+              pageNo={pageNo}
             />
           </Stack>
         </Container>

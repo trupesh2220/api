@@ -17,6 +17,7 @@ import { CompanyCard } from "src/sections/companies/company-card";
 import { CompaniesSearch } from "src/sections/companies/companies-search";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import RegisterForm from "src/Model/NewFormForModelPopup";
 
 function Page() {
   const [companies, setCompanies] = useState([]);
@@ -37,7 +38,7 @@ function Page() {
     url.searchParams.append("page", updateUrl);
     url.searchParams.append("limit", 6);
 
-    const res = await fetch(url, {
+    const res = await fetch (url, {
       method: "GET",
       headers: { "content-type": "application/json" },
     });
@@ -50,6 +51,7 @@ function Page() {
   }
   return (
     <>
+    
       <Head>
         <title>Companies | Devias Kit</title>
       </Head>
@@ -128,6 +130,7 @@ function Page() {
           </Stack>
         </Container>
       </Box>
+
     </>
   );
 }
