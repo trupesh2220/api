@@ -1,6 +1,5 @@
 import * as React from "react";
-// import Box from "@mui/material/Box";
-// import Button from "@mui/material/Button";
+
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { SvgIcon, DateCalander } from "@mui/material";
@@ -9,8 +8,6 @@ import axios from "axios";
 import { Field, useFormik } from "formik";
 import { signUpSchema } from "src/scm";
 import { Stack } from "@mui/system";
-import { AccountProfileDetails } from "src/sections/account/account-profile-details";
-// import { signUpSchema } from "src/schemas";
 import {
   Box,
   Button,
@@ -29,7 +26,7 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: "50%",
   bgcolor: "background.paper",
-  // border: "2px solid #000",
+  border: "2px solid #000",
   boxShadow: 24,
   p: 4,
   borderRadius: "10px",
@@ -67,7 +64,11 @@ export default function BasicModal() {
     phone: "",
     createdAt: new Date(),
     file: null,
+    addressCity: "",
+    addressState: "",
+    addressCountry: "",
   };
+
   const { values, errors, handleBlur, handleChange, handleSubmit, touched, setFieldValue } =
     useFormik({
       initialValues: initialValues,
@@ -75,9 +76,27 @@ export default function BasicModal() {
       onSubmit: (values) => {
         setOpen(false);
         addValueInArr(values);
+        console.log("value", values);
       },
     });
-
+  const states = [
+    {
+      value: "surat",
+      label: "Surat",
+    },
+    {
+      value: "ahemedabad",
+      label: "Ahemedabad",
+    },
+    {
+      value: "vadodara",
+      label: "Vadodara",
+    },
+    {
+      value: "kush",
+      label: "Kachha",
+    },
+  ];
   return (
     <div>
       <Button onClick={handleOpen}>
@@ -103,91 +122,158 @@ export default function BasicModal() {
         <Box sx={style}>
           <form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Card>
-              <CardHeader subheader="The information can be edited" title="Profile" />
+              <CardHeader subheader="Add Jenune Data in Des Bord" title="Add Data" />
               <CardContent sx={{ pt: 0 }}>
                 <Box sx={{ m: -1.5 }}>
                   <Grid container spacing={3}>
                     <Grid xs={12} md={6}>
                       <TextField
                         fullWidth
-                        helperText="Please specify the first name"
-                        label="First name"
-                        name="firstName"
+                        label="name"
+                        name="name"
+                        error={errors.name && touched.name !== undefined ? true : false}
+                        helperText={touched.name && errors.name}
+                        value={values.name}
+                        onBlur={handleBlur}
                         onChange={handleChange}
                         required
-                        value={values.firstName}
                       />
                     </Grid>
                     <Grid xs={12} md={6}>
                       <TextField
                         fullWidth
-                        label="Last name"
-                        name="lastName"
-                        onChange={handleChange}
-                        required
-                        value={values.lastName}
-                      />
-                    </Grid>
-                    <Grid xs={12} md={6}>
-                      <TextField
-                        fullWidth
-                        label="Email Address"
+                        label="email"
                         name="email"
+                        error={errors.email && touched.email !== undefined ? true : false}
+                        helperText={touched.email && errors.email}
+                        value={values.email}
+                        onBlur={handleBlur}
                         onChange={handleChange}
                         required
-                        value={values.email}
                       />
                     </Grid>
                     <Grid xs={12} md={6}>
                       <TextField
                         fullWidth
-                        label="Phone Number"
-                        name="phone"
+                        label="age"
+                        name="age"
+                        error={errors.age && touched.age !== undefined ? true : false}
+                        helperText={touched.age && errors.age}
+                        value={values.age}
+                        onBlur={handleBlur}
                         onChange={handleChange}
-                        type="number"
+                        required
+                      />
+                    </Grid>
+                    <Grid xs={12} md={6}>
+                      <TextField
+                        fullWidth
+                        label="phone"
+                        name="phone"
+                        error={errors.phone && touched.phone !== undefined ? true : false}
+                        helperText={touched.phone && errors.phone}
                         value={values.phone}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Grid>
+                    {/* <Grid xs={12} md={6}>
+                      <TextField
+                        fullWidth
+                        label="City"
+                        name="addressCity"
+                        error={errors.addressCity && touched.addressCity !== undefined ? true : false}
+                        helperText={errors.addressCity}
+                        value={values.addressCity}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Grid> */}
+                    <Grid xs={12} md={6}>
+                      <TextField
+                        fullWidth
+                        label="city"
+                        name="addressCity"
+                        error={
+                          errors.addressCity && touched.addressCity !== undefined ? true : false
+                        }
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        helperText={touched.addressCity &&  errors.addressCity}
+                        required
+                        select
+                        SelectProps={{ native: true }}
+                        value={values.addressCity}
+                      >
+                        {states.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid xs={12} md={6}>
+                      <TextField
+                        fullWidth
+                        label="State"
+                        name="addressState"
+                        error={
+                          errors.addressState && touched.addressState !== undefined ? true : false
+                        }
+                        helperText={touched.addressState &&  errors.addressState}
+                        value={values.addressState}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        required
                       />
                     </Grid>
                     <Grid xs={12} md={6}>
                       <TextField
                         fullWidth
                         label="Country"
-                        name="country"
+                        name="addressCountry"
+                        error={
+                          errors.addressCountry && touched.addressCountry !== undefined
+                            ? true
+                            : false
+                        }
+                        helperText={ touched.addressCountry &&  errors.addressCountry}
+                        value={values.addressCountry}
+                        onBlur={handleBlur}
                         onChange={handleChange}
                         required
-                        value={values.country}
                       />
                     </Grid>
-                    {/* <Grid
-                xs={12}
-                md={6}
-              >
-                <TextField
-                  fullWidth
-                  label="Select State"
-                  name="state"
-                  onChange={handleChange}
-                  required
-                  select
-                  SelectProps={{ native: true }}
-                  value={values.state}
-                >
-                  {states.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </TextField>
-              </Grid> */}
+                    <Grid xs={12} md={6}>
+                      <TextField
+                        fullWidth
+                        // label="avatar"
+                        accept="image/png, image/jpeg"
+                        name="avatar"
+                        error={
+                          errors.avatar && touched.avatar !== undefined
+                            ? true
+                            : false
+                        }
+                        helperText={ touched.avatar && errors.avatar}
+                        value={values.avatar}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        required
+                        type="file"
+                      />
+                    </Grid>
+                    
                   </Grid>
                 </Box>
               </CardContent>
               <Divider />
               <CardActions sx={{ justifyContent: "flex-end" }}>
-                <Button variant="contained">Save details</Button>
+                <Button variant="contained" type="submit">
+                  Save details
+                </Button>
               </CardActions>
             </Card>
           </form>
