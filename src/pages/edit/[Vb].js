@@ -19,6 +19,7 @@ import {
   TextField,
   Unstable_Grid2 as Grid,
 } from "@mui/material";
+import { useState } from "react";
 
 const style = {
   position: "absolute",
@@ -32,28 +33,48 @@ const style = {
   p: 4,
   borderRadius: "10px",
 };
-
 export default function BasicModal() {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const router = useRouter();
   const { Vb } = router.query;
+  const initialValues = { name: "", email: "" };
+  const [addNewValue, setAddNewValue] = useState([]);
 
-  const [initialValues, setInitialValues] = React.useState([]);
-  // const [addNewValue, setAddNewValue] = useState([])
+  React.useEffect(() => {
+    handleOpen();
+    getAllData();
+  }, []);
 
-  const { values, errors, handleBlur, handleChange, handleSubmit, touched, setFieldValue } =
-    useFormik({
-      initialValues: { initialValues },
-      validationSchema: signUpSchema,
-      enableReinitialize,
-      onSubmit: (values) => {
-        setOpen(false);
-        axios.put(`http://localhost:8000/data/${Vb}`, values);
-        router.push("/customers");
-      },
-    });
+  React.useEffect(() => {
+    setTimeout(() => {
+      console.log("addnewvalue", addNewValue);
+    }, 7000);
+  }, []);
+
+  const { values, errors, handleBlur, handleChange, handleSubmit, touched } = useFormik({
+    initialValues: initialValues,
+    validationSchema: signUpSchema,
+    onSubmit: (values) => {
+      setOpen(false);
+      axios.put(`http://localhost:8000/data/${Vb}`, values);
+      router.push("/customers");
+    },
+  });
+
+  const getAllData = () => {
+    axios
+      .get(`http://localhost:8000/data/${Vb}`)
+      .then((result) => {
+        console.log("main data", result.data);
+        setAddNewValue(result.data);
+        console.log(addNewValue);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
   const states = [
     {
       value: "surat",
@@ -72,38 +93,6 @@ export default function BasicModal() {
       label: "Rajkot",
     },
   ];
-  React.useEffect(() => {
-    handleOpen();
-    getAllData();
-  }, []);
-  const getAllData = () => {
-    axios
-      .get(`http://localhost:8000/data/${Vb}`)
-      .then((result) => {
-        console.log("main data", result.data);
-        setInitialValues(result.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-  React.useEffect(() => {
-    setTimeout(() => {
-      console.log("initialValues", initialValues);
-    }, 7000);
-  }, []);
-  const getUpdatedValue = (e) => {
-    handleChange;
-    setInitialValues({ ...initialValues, [e.target.name]: e.target.value });
-    values.name = initialValues.name;
-    values.email = initialValues.email;
-    values.age = initialValues.age;
-    values.phone = initialValues.phone;
-    values.addressCity = initialValues.addressCity;
-    values.addressState = initialValues.addressState;
-    values.addressCountry = initialValues.addressCountry;
-    values.createdAt = new Date();
-  };
   return (
     <div>
       <Modal
@@ -126,9 +115,10 @@ export default function BasicModal() {
                         name="name"
                         error={errors.name && touched.name !== undefined ? true : false}
                         helperText={touched.name && errors.name}
-                        value={initialValues.name}
+                        defaultValue={addNewValue.name}
+                        value={values.name}
                         onBlur={handleBlur}
-                        onChange={getUpdatedValue}
+                        onChange={handleChange}
                         required
                       />
                     </Grid>
@@ -139,9 +129,10 @@ export default function BasicModal() {
                         name="email"
                         error={errors.email && touched.email !== undefined ? true : false}
                         helperText={touched.email && errors.email}
-                        value={initialValues.email}
+                        defaultValue={addNewValue.email}
+                        value={values.email}
                         onBlur={handleBlur}
-                        onChange={getUpdatedValue}
+                        onChange={handleChange}
                         required
                       />
                     </Grid>
@@ -150,11 +141,12 @@ export default function BasicModal() {
                         fullWidth
                         label="age"
                         name="age"
+                        defaultChecked={addNewValue.age}
                         error={errors.age && touched.age !== undefined ? true : false}
                         helperText={touched.age && errors.age}
-                        value={initialValues.age}
+                        value={values.age}
                         onBlur={handleBlur}
-                        onChange={getUpdatedValue}
+                        onChange={handleChange}
                         type="number"
                         required
                       />
@@ -166,9 +158,10 @@ export default function BasicModal() {
                         name="phone"
                         error={errors.phone && touched.phone !== undefined ? true : false}
                         helperText={touched.phone && errors.phone}
-                        value={initialValues.phone}
+                        defaultChecked={addNewValue.phon}
+                        value={values.phone}
                         onBlur={handleBlur}
-                        onChange={getUpdatedValue}
+                        onChange={handleChange}
                         type="number"
                         required
                       />
@@ -181,13 +174,14 @@ export default function BasicModal() {
                         error={
                           errors.addressCity && touched.addressCity !== undefined ? true : false
                         }
-                        onChange={getUpdatedValue}
+                        onChange={handleChange}
                         onBlur={handleBlur}
                         helperText={touched.addressCity && errors.addressCity}
                         required
                         select
                         SelectProps={{ native: true }}
-                        value={initialValues.addressCity}
+                        defaultChecked={addNewValue.addressCity}
+                        value={values.addressCity}
                       >
                         {states.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -205,9 +199,10 @@ export default function BasicModal() {
                           errors.addressState && touched.addressState !== undefined ? true : false
                         }
                         helperText={touched.addressState && errors.addressState}
-                        value={initialValues.addressState}
+                        defaultChecked={addNewValue.addressState}
+                        value={values.addressState}
                         onBlur={handleBlur}
-                        onChange={getUpdatedValue}
+                        onChange={handleChange}
                         required
                       />
                     </Grid>
@@ -222,9 +217,10 @@ export default function BasicModal() {
                             : false
                         }
                         helperText={touched.addressCountry && errors.addressCountry}
-                        value={initialValues.addressCountry}
+                        defaultChecked={addNewValue.addressCountry}
+                        value={values.addressCountry}
                         onBlur={handleBlur}
-                        onChange={getUpdatedValue}
+                        onChange={handleChange}
                         required
                       />
                     </Grid>
@@ -235,9 +231,10 @@ export default function BasicModal() {
                         name="avatar"
                         error={errors.avatar && touched.avatar !== undefined ? true : false}
                         helperText={touched.avatar && errors.avatar}
+                        defaultValue={addNewValue.avatar}
                         value={values.avatar}
                         onBlur={handleBlur}
-                        onChange={getUpdatedValue}
+                        onChange={handleChange}
                         required
                         type="file"
                       />
